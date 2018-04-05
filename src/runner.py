@@ -15,7 +15,6 @@ channel.basic_qos(prefetch_count=1)
 
 def check_one_address(address):
     address = bytes.decode(address)
-    address = re.sub(r'County Rd 31', 'Xerxes Ave S', address)
     speed = check_address.get_speed(address)
     if speed == -1:
         return

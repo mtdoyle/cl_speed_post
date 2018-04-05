@@ -1,14 +1,17 @@
 import psycopg2
 from psycopg2 import sql
 import json
+import datetime
 
 postgres_settings = json.load(open('servers.json'))['servers']['postgres']
+
+table_name = "clspeed_{0}".format(str(datetime.date.today())).replace("-","_")
 
 def create_tables():
     """ create tables in the PostgreSQL database"""
     commands = sql.SQL = (
         """
-        CREATE TABLE clspeed_edina (
+        CREATE TABLE {0} (
             speed DECIMAL,
             street VARCHAR(255),
             city VARCHAR(255),
@@ -18,7 +21,7 @@ def create_tables():
             emm_lng decimal(12,10),
             emm_acc VARCHAR(20)
         )
-        """)
+        """.format(table_name))
     conn = None
     try:
         # read the connection parameters
@@ -45,9 +48,9 @@ def create_tables():
 def write_entry(speed, entry):
     commands = sql.SQL = (
         """
-        INSERT INTO clspeed_edina (speed, street, city, state, zip, emm_lat, emm_lng, emm_acc)
+        INSERT INTO {0} (speed, street, city, state, zip, emm_lat, emm_lng, emm_acc)
         VALUES (%s,%s,%s,%s,%s,%s,%s,%s)
-        """)
+        """.format(table_name))
     conn = None
     try:
         # read the connection parameters
