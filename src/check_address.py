@@ -5,17 +5,28 @@ import json
 
 def get_speed(address):
     address_to_send = address.split(",")[0:2]
+    raw_response = requests.get("https://geoamsrvcl.centurylink.com/geoam/addressmatch/addresses?q={0},{1}".format(address_to_send[0],address_to_send[1]), verify=False).text
+    json_response = json.loads(raw_response)
+    if json_response['responseData']['addresses']:
+        submit_string = json_response['responseData']['addresses'][0]['fullAddress'].replace(' ', "+")
+    else:
+        print("Bad address: {0}".format(address_to_send))
+        return "0.5"
     print("Checking address {0}".format(address_to_send))
-    submit_string = address_to_send[0].replace(' ', '+')
     response = requests.post(
-        "https://shop.centurylink.com/MasterWebPortal/freeRange/login/shop/addressAuthentication?form.authType=ban&form.newShopAddress=true&form.pageType=page&form.singleLineAddress={0},{1},MN,USA&form.unitNumber=".format(submit_string, address_to_send[1]),
+        "https://shop.centurylink.com/MasterWebPortal/freeRange/login/shop/addressAuthentication?form.authType=ban&form.newShopAddress=true&form.pageType=page&form.singleLineAddress={0}&form.unitNumber=".format(submit_string),
         verify=False)
 
     page_source = response.text
     found_speeds = re.findall("thisProd\['downDisplay'\].*", page_source)
     highest_speed = 0
     for speed in found_speeds:
-        curr_speed = float(re.sub(r'[a-zA-Z\'\[\]\"\;=\s]+', r'', speed))
+        if "768" in speed:
+            speed = "0.768"
+        try:
+            curr_speed = float(re.sub(r'[a-zA-Z\'\[\]\"\;=\s]+', r'', speed))
+        except Exception as e:
+            print(e)
         if curr_speed > highest_speed:
             highest_speed = curr_speed
     print("Highest speed found: {0} Mbps".format(highest_speed))
