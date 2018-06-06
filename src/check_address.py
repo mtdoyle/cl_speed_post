@@ -20,6 +20,7 @@ def get_speed(address):
     page_source = response.text
     found_speeds = re.findall("thisProd\['downDisplay'\].*", page_source)
     highest_speed = 0
+    curr_speed = None
     for speed in found_speeds:
         if "768" in speed:
             speed = "0.768"
@@ -27,7 +28,10 @@ def get_speed(address):
             curr_speed = float(re.sub(r'[a-zA-Z\'\[\]\"\;=\s]+', r'', speed))
         except Exception as e:
             print(e)
-        if curr_speed > highest_speed:
+            return 0
+        if curr_speed is None:
+            return 0
+        elif curr_speed > highest_speed:
             highest_speed = curr_speed
     print("Highest speed found: {0} Mbps".format(highest_speed))
     return highest_speed

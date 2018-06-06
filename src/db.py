@@ -5,7 +5,8 @@ import datetime
 
 postgres_settings = json.load(open('servers.json'))['servers']['postgres']
 
-table_name = "clspeed_{0}".format(str(datetime.date.today())).replace("-","_")
+# table_name = "clspeed_{0}".format(str(datetime.date.today())).replace("-","_")
+table_name = "clspeed"
 
 def create_tables():
     """ create tables in the PostgreSQL database"""
